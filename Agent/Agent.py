@@ -10,6 +10,7 @@ from Actor_Critic_for_JSP.Memory.PreMemory import preMemory
 class Agent():
     """docstring for DQN"""
     def __init__(self,n,O_max_len,Gamma,net_update,learning_rate,M_size,B_size,dueling=False,double=False,PER=False,model_path=None):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.es=8000*n*O_max_len
         self.record=0
         self.double=double
@@ -19,9 +20,9 @@ class Agent():
         self.O_max_len=O_max_len
         super(Agent, self).__init__()
         if dueling:
-            self.eval_net, self.target_net = CNN_dueling(self.n,self.O_max_len), CNN_dueling(self.n,self.O_max_len)
+            self.eval_net, self.target_net = CNN_dueling(self.n,self.O_max_len).to(self.device), CNN_dueling(self.n,self.O_max_len).to(self.device)
         else:
-            self.eval_net, self.target_net = CNN_FNN(self.n, self.O_max_len), CNN_FNN(self.n, self.O_max_len)
+            self.eval_net, self.target_net = CNN_FNN(self.n, self.O_max_len).to(self.device), CNN_FNN(self.n, self.O_max_len).to(self.device)
         self.Q_NETWORK_ITERATION=net_update
         self.BATCH_SIZE=B_size
         self.learn_step_counter = 0
@@ -42,12 +43,12 @@ class Agent():
     def choose_action(self, state):
         self.record+=1
         state=np.reshape(state,(-1,3,self.n,self.O_max_len))
-        state=torch.FloatTensor(state)
+        state=torch.FloatTensor(state).to(self.device)
         # print(state.size())
         # state = torch.unsqueeze(torch.FloatTensor(state), 0) # get a 1D array
         if np.random.randn() > self.EPISILO:# greedy policy
             action_value = self.eval_net.forward(state)
-            action = torch.max(action_value, 1)[1].data.numpy()[0]
+            action = torch.max(action_value, 1)[1].data.cpu().numpy()[0]
             # action = action[0] if ENV_A_SHAPE == 0 else action.reshape(ENV_A_SHAPE)
         else: # random policy
             action = np.random.randint(0,17)
@@ -58,8 +59,8 @@ class Agent():
 
     def PER_error(self,state, action, reward, next_state):
 
-        state = torch.FloatTensor(np.reshape(state, (-1, 3, self.n, self.O_max_len)))
-        next_state= torch.FloatTensor(np.reshape(next_state, (-1, 3, self.n, self.O_max_len)))
+        state = torch.FloatTensor(np.reshape(state, (-1, 3, self.n, self.O_max_len))).to(self.device)
+        next_state= torch.FloatTensor(np.reshape(next_state, (-1, 3, self.n, self.O_max_len))).to(self.device)
         p=self.eval_net.forward(state)
         p_=self.eval_net.forward(next_state)
         p_target=self.target_net(state)
@@ -70,8 +71,8 @@ class Agent():
             qt=reward+self.GAMMA*p_target.gather(1,q_a)
         else:
             qt=reward+self.GAMMA*p_target.max()
-        qt=qt.detach().numpy()
-        p=p.detach().numpy()
+        qt=qt.detach().cpu().numpy()
+        p=p.detach().cpu().numpy()
         errors=np.abs(p[0][action]-qt)
         return errors
 
@@ -94,7 +95,7 @@ class Agent():
 
         if self.PER:
             [batch, batch_indices, batch_priorities] = self.memory.sample(self.BATCH_SIZE)
-            batch_priorities=torch.Tensor(batch_priorities)
+            batch_priorities=torch.Tensor(batch_priorities).to(self.device)
         else:
             batch = self.memory.sample(self.BATCH_SIZE)
 
@@ -105,33 +106,33 @@ class Agent():
         batch_reward=np.array([o[2] for o in batch])
         # print(batch_reward)
         # print( )
-        batch_action = torch.LongTensor(np.reshape(batch_action, (-1, len(batch_action)))).detach()
-        batch_reward =  torch.FloatTensor(np.reshape(batch_reward, (-1, len(batch_reward))))
+        batch_action = torch.LongTensor(np.reshape(batch_action, (-1, len(batch_action)))).detach().to(self.device)
+        batch_reward =  torch.FloatTensor(np.reshape(batch_reward, (-1, len(batch_reward)))).to(self.device)
         # print(batch_action)
 
-        batch_state=torch.FloatTensor(np.reshape(batch_state, (-1, 3, self.n, self.O_max_len)))
-        batch_next_state =torch.FloatTensor(np.reshape(batch_next_state, (-1, 3, self.n, self.O_max_len)))
+        batch_state=torch.FloatTensor(np.reshape(batch_state, (-1, 3, self.n, self.O_max_len))).to(self.device)
+        batch_next_state =torch.FloatTensor(np.reshape(batch_next_state, (-1, 3, self.n, self.O_max_len))).to(self.device)
 
-        q_eval = self.eval_net(batch_state).gather(1, batch_action)
-        q_next = self.target_net(batch_next_state).detach()
+        q_eval = self.eval_net(batch_state).gather(1, batch_action).to(self.device)
+        q_next = self.target_net(batch_next_state).detach().to(self.device)
         if self.double:
             q_next_eval=self.eval_net( batch_next_state).detach()
             q_a=q_next_eval.argmax(dim=1)
-            q_a=torch.reshape(q_a,(-1,len(q_a)))
+            q_a=torch.reshape(q_a,(-1,len(q_a))).to(self.device)
             q_target = batch_reward + self.GAMMA * q_next.gather(1, q_a)
         else:
             q_target = batch_reward + self.GAMMA * q_next.max(1)[0]
 
         if self.PER:
-            errors=torch.abs(q_eval-q_target)
+            errors=torch.abs(q_eval-q_target).to(self.device)
             loss=(batch_priorities*errors**2).sum()
             for Bi in range(self.BATCH_SIZE):
                 index=batch_indices[Bi]
-                self.memory.update(index,errors[0][Bi].detach().numpy())
+                self.memory.update(index,errors[0][Bi].detach().cpu().numpy())
         else:
-            loss = self.loss_func(q_eval, q_target)
+            loss = self.loss_func(q_eval, q_target).to(self.device)
 
-        l=loss.detach().numpy()
+        l=loss.detach().cpu().numpy()
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
