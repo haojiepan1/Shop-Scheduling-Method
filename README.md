@@ -54,6 +54,7 @@
 7. DQN/DDQN/D3QN for FJSP
 8. DQN/DDQN/D3QN for JSP
 9. GA for RJSP
-10. MADRL for two-robot flow shop scheduling problem (TRFSP)
-11. GA for FJSP with setup time
-12. GA for FJSP with worker
+- https://github.com/Aihong-Sun/GA-heuristic-approach_to_simultaneous_-scheduling_or_AGV_and_machine(https://github.com/Aihong-Sun/GA-heuristic-approach_to_simultaneous_-scheduling_or_AGV_and_machine)
+11. MADRL for two-robot flow shop scheduling problem (TRFSP)
+12. GA for FJSP with setup time
+13. GA for FJSP with worker
