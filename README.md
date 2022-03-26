@@ -1,4 +1,5 @@
-# Shop scheduling method
+# Shop scheduling method/ Under maintenance ...
+Code that involves related shop floor scheduling issues 
 
 ## shop floor scheduling problem including
 
@@ -23,16 +24,20 @@
     - AC
     - ... 
 ## Datasets
-1. job shop scheduling problem dataset:
-- la
-- ft
-- ...
+1. job shop scheduling problem dataset
+- https://github.com/Aihong-Sun/Shop-Scheduling-Method/tree/main/Dataset
+
 2. flexible jobs shop scheduling problem dataset
-- h
+- https://github.com/Aihong-Sun/ACO_for_DRCFJSP/tree/main/Barnes/Text
+- https://github.com/Aihong-Sun/ACO_for_DRCFJSP/tree/main/Brandimarte_Data/FJS
+- https://github.com/Aihong-Sun/ACO_for_DRCFJSP/tree/main/Dauzere_Data/Text
+
 3. flow shop scheduling problem dataset
-- j
+- http://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/flowshop2.txt
+
 4. Transbot job shop scheduling problem dataset
--l
+- https://github.com/Aihong-Sun/GA-heuristic-approach_to_simultaneous_-scheduling_or_AGV_and_machine/tree/main/Instance/Bilge_Ulusoy
+
 
 ## Requirements
 - python 3.7+
@@ -43,18 +48,24 @@
 
 ## Work accumulation
 1. shop floor scheduling tools
-  - code for Gantt graph drawing 
-  - code for Greedy decoding
-  - code for 
+  - code for Gantt graph drawing  
 2. GA for JSP
 3. GA for FJSP
-4. GA for HFSP
-5. ACO for JSP
-6. ACO for FJSP
-7. DQN/DDQN/D3QN for FJSP
-8. DQN/DDQN/D3QN for JSP
-9. GA for RJSP
-- https://github.com/Aihong-Sun/GA-heuristic-approach_to_simultaneous_-scheduling_or_AGV_and_machine(https://github.com/Aihong-Sun/GA-heuristic-approach_to_simultaneous_-scheduling_or_AGV_and_machine)
-11. MADRL for two-robot flow shop scheduling problem (TRFSP)
-12. GA for FJSP with setup time
-13. GA for FJSP with worker
+- https://github.com/Aihong-Sun/GA_for_FJSP
+5. GA for HFSP
+- https://github.com/Aihong-Sun/GA_for_HFSP
+6. ACO for JSP
+7. ACO for FJSP
+- https://github.com/Aihong-Sun/ACO_for_FJSP
+9. DQN/DDQN/D3QN for FJSP
+- https://github.com/Aihong-Sun/DRL_to_DFJSP
+11. DQN/DDQN/D3QN for JSP
+- https://github.com/Aihong-Sun/Shop-Scheduling-Method
+12. GA for RJSP
+- https://github.com/Aihong-Sun/GA-heuristic-approach_to_simultaneous_-scheduling_or_AGV_and_machine
+13. MADRL for two-robot flow shop scheduling problem (TRFSP)
+14. GA for FJSP with Fixture
+- https://github.com/Aihong-Sun/FJSP_with_Loading_and_unloading
+16. GA for FJSP with worker
+- https://github.com/Aihong-Sun/ACO_for_DRCFJSP
+
